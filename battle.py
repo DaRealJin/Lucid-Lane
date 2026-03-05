@@ -11,9 +11,6 @@ class Battle:
     """
 
     def __init__(self, player_stats: dict, enemies: list[dict]):
-        #Example:
-        #player_stats = {"hp": 100, "max_hp": 100, "energy": 50, "max_energy": 50}
-        #enemies = [{"name":"Enemy 1","hp":30,"max_hp":30}, ...]
         self.player = player_stats
         self.enemies = enemies
 
@@ -26,16 +23,13 @@ class Battle:
         #end_result: None / "run" / "win" / "lose"
         self.end_result = None
 
-        #Menu like your mockup (2x2)
+        #Menu
         self.options = ["Attack", "Skill", "Back", "Items"]
-        #Menu layout matches a 2x2 grid like classic JRPGs
         self.menu_index = 0
 
-        #Message box (so it feels more like Pokémon/Omori)
+        #Message box
         self.message = ""
         self.message_timer = 0
-
-        #Turn ownership (easy to extend later into speed/party)
         self.turn = "player"
 
     def is_over(self) -> bool:
@@ -82,7 +76,6 @@ class Battle:
                 self._try_run()
 
     def update(self):
-        #You can extend this for animations later
         if self.is_over():
             return
 
@@ -100,7 +93,7 @@ class Battle:
             self.message_timer -= 1
             if self.message_timer == 0 and self.state == "message":
                 self.state = "menu"
-
+        #Options of what you can choose in a combat situation
     def _choose_option(self):
         choice = self.options[self.menu_index]
 
@@ -114,8 +107,6 @@ class Battle:
             self._set_message("Items not added yet.", 45)
 
         elif choice == "Back":
-            #In your mockup, Back would return to a previous menu.
-            #For now, we just show a message.
             self._set_message("No previous menu yet.", 45)
 
     def _player_attack(self):
@@ -123,7 +114,7 @@ class Battle:
             self.end_result = "win"
             return
 
-        #Attack first enemy (you can add target selection later)
+        #Attack first enemy
         target = self.enemies[0]
         dmg = 10
         target["hp"] -= dmg
@@ -151,7 +142,7 @@ class Battle:
         if self.player["hp"] < 0:
             self.player["hp"] = 0
 
-        #Add a message pause (feels turn-based)
+        #Add a message pause
         self._set_message(f"{attacker['name']} hits you for {dmg}!", 60)
 
         if self.player["hp"] <= 0:
@@ -162,12 +153,12 @@ class Battle:
         self.end_result = "run"
 
     def _set_message(self, text, frames=60):
-        #Shows a message for a fixed number of frames to pace the battle like Pokémon/Omori(self, msg: str, frames: int):
+        #Shows a message for a fixed number of frames to pace the battle
         self.message = msg
         self.message_timer = frames
         self.state = "message"
 
-    #----------------- Drawing UI (your mockup layout) -----------------
+    #----------------- Drawing UI -----------------
 
     def draw(self, screen):
         screen.fill((240, 240, 240))
@@ -186,7 +177,7 @@ class Battle:
             self._draw_message(screen)
 
     def _draw_enemies(self, screen):
-        #3 boxes across the top-right area like your image
+        #3 boxes
         box_w, box_h = 140, 140
         start_x = WIDTH - (box_w * 3) - 40
         y = 40
@@ -220,7 +211,7 @@ class Battle:
         self._draw_bar(screen, x + 10, y + 135, 140, 16, self.player["energy"], self.player["max_energy"], label="Energy")
 
     def _draw_menu(self, screen):
-        #Big menu bar like your mockup (2x2 buttons)
+        #Big menu bar
         box_x, box_y = 240, HEIGHT - 200
         box_w, box_h = 320, 150
 
