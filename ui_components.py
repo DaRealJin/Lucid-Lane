@@ -3,13 +3,13 @@ import sys
 from config import GRAY, BLUE, BLACK
 
 class Button:
-    #Simple clickable UI button used across menus
     def __init__(self, text, x, y, width, height):
+        # Stores button text and clickable rectangle.
         self.text = text
         self.rect = pygame.Rect(x, y, width, height)
 
     def draw(self, surface, font):
-        #Highlights the button when the mouse is hovering over it
+        # Changes colour when the mouse is hovering over the button.
         colour = BLUE if self.rect.collidepoint(pygame.mouse.get_pos()) else GRAY
         pygame.draw.rect(surface, colour, self.rect)
         pygame.draw.rect(surface, BLACK, self.rect, 2)
@@ -19,19 +19,18 @@ class Button:
         surface.blit(text_surface, text_rect)
 
     def clicked(self, event):
-        #Returns True only on a left-mouse click inside the button rectangle
+        # Returns True only for a left mouse click inside the button.
         return event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.rect.collidepoint(event.pos)
 
+# Creates a reusable background-drawing function for menu screens.
 def make_draw_bg(background, overlay):
-    #Returns a closure so menus can reuse the same background draw logic without duplicating code
-    #returns a function you can call each frame
     def draw_bg(screen):
         screen.blit(background, (0, 0))
         screen.blit(overlay, (0, 0))
     return draw_bg
 
+# Shared helper for simple one-message screens.
 def simple_screen(screen, clock, font, draw_bg, text, text_colour):
-    #Reusable screen loop for showing a single message and waiting for ESC(screen, clock, font, draw_bg, text, text_colour):
     while True:
         draw_bg(screen)
 
