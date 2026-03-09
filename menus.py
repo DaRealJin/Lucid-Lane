@@ -20,12 +20,14 @@ def lore_screen(screen, clock, font, draw_bg):
 
 
 def mech_instructions(screen, clock, font, draw_bg):
+    # Displays a short mechanics instruction screen.
     simple_screen(screen, clock, font, draw_bg,
-                  "Happy beats angry, Angry beats Sad, Sad beats angry",
+                  "Press E to interact with the boss at the end",
                   WHITE)
 
 
 def score_screen(screen, clock, font, draw_bg):
+    # Reads and displays the saved high score.
     high_score = load_high_score()
     simple_screen(screen, clock, font, draw_bg,
                   f"Highest Score: {high_score}",
@@ -33,6 +35,7 @@ def score_screen(screen, clock, font, draw_bg):
 
 
 def information_menu(screen, clock, font, draw_bg, controls):
+    # Buttons for the information submenu.
     buttons = [
         Button("Game Lore", 300, 260, 200, 50),
         Button("Mechanics", 300, 330, 200, 50),
@@ -73,6 +76,7 @@ def information_menu(screen, clock, font, draw_bg, controls):
 
 
 def controls_menu(screen, clock, font, draw_bg, controls):
+    # Rebuilds button text so updated key names are shown immediately.
     def make_buttons():
         return [
             Button(f"Up: {pygame.key.name(controls['up']).upper()}", 260, 200, 280, 50),
@@ -99,12 +103,14 @@ def controls_menu(screen, clock, font, draw_bg, controls):
                 pygame.quit()
                 sys.exit()
 
+            # Escape cancels key rebinding or exits the controls menu.
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 if waiting_for:
                     waiting_for = None
                 else:
                     return controls
 
+            # While not waiting for a key, clicking a button chooses which control to edit.
             if waiting_for is None:
                 for btn in buttons:
                     if btn.clicked(event):
@@ -119,6 +125,7 @@ def controls_menu(screen, clock, font, draw_bg, controls):
                         elif btn.text == "Back":
                             return controls
 
+            # When a key is pressed, the selected control is updated and saved.
             if waiting_for and event.type == pygame.KEYDOWN:
                 controls[waiting_for] = event.key
                 save_controls(controls)
@@ -133,7 +140,7 @@ def controls_menu(screen, clock, font, draw_bg, controls):
 
 
 def reset_controls_to_defaults(controls):
-    #Reset the keys
+    # Restores the default arrow-key controls.
     controls["up"] = pygame.K_UP
     controls["down"] = pygame.K_DOWN
     controls["left"] = pygame.K_LEFT
@@ -142,6 +149,7 @@ def reset_controls_to_defaults(controls):
 
 
 def settings_menu(screen, clock, font, draw_bg, controls):
+    # Buttons for the settings submenu.
     buttons = [
         Button("Controls", 300, 260, 200, 50),
         Button("Reset Controls", 300, 330, 200, 50),
@@ -179,13 +187,14 @@ def settings_menu(screen, clock, font, draw_bg, controls):
 
 
 def start_game_menu(screen, clock, font, draw_bg, controls):
-#Difficulty selection screen; returns the chosen difficulty string or None(screen, clock, font, draw_bg, controls):
+    # Difficulty selection buttons.
     buttons = [
         Button("Easy", 300, 220, 200, 50),
         Button("Normal", 300, 300, 200, 50),
         Button("Hard", 300, 380, 200, 50),
     ]
 
+    # The layout changes depending on whether a save file exists.
     if has_save():
         buttons.append(Button("Load Game", 300, 460, 200, 50))
         buttons.append(Button("Back", 300, 540, 200, 50))
@@ -204,22 +213,19 @@ def start_game_menu(screen, clock, font, draw_bg, controls):
                 sys.exit()
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                return controls
+                return None
 
             for btn in buttons:
                 if btn.clicked(event):
                     if btn.text in ("Easy", "Normal", "Hard"):
                         save_game(btn.text)
-                        simple_screen(screen, clock, font, draw_bg, f"Game Running: {btn.text}", WHITE)
+                        return btn.text
                     elif btn.text == "Load Game":
                         data = load_game_data()
-                        if data:
-                            diff = data.get("difficulty", "Normal")
-                            simple_screen(screen, clock, font, draw_bg, f"Loaded Game: {diff}", WHITE)
-                        else:
-                            simple_screen(screen, clock, font, draw_bg, "No save found!", WHITE)
+                        diff = data.get("difficulty", "Normal")
+                        return diff
                     elif btn.text == "Back":
-                        return controls
+                        return None
 
         for btn in buttons:
             btn.draw(screen, font)
@@ -229,7 +235,7 @@ def start_game_menu(screen, clock, font, draw_bg, controls):
 
 
 def menu(screen, clock, font, draw_bg, controls):
-#Main menu loop; returns only when the program quitsscreen, clock, font, draw_bg, controls):
+    # Main menu buttons.
     buttons = [
         Button("Start Game", 300, 160, 200, 50),
         Button("Information", 300, 260, 200, 50),
@@ -251,7 +257,9 @@ def menu(screen, clock, font, draw_bg, controls):
             for btn in buttons:
                 if btn.clicked(event):
                     if btn.text == "Start Game":
-                        controls = start_game_menu(screen, clock, font, draw_bg, controls)
+                        diff = start_game_menu(screen, clock, font, draw_bg, controls)
+                        if diff:
+                            game.run_game(screen, clock, diff)
                     elif btn.text == "Information":
                         controls = information_menu(screen, clock, font, draw_bg, controls)
                     elif btn.text == "Settings":
