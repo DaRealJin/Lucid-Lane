@@ -55,19 +55,19 @@ def draw_map(screen, grid, tiles, cam):
             world_y = y * TILE
 
             sx, sy = cam.apply_pos(world_x, world_y)
-
+#Skips tiles that are fully outside the screen.
             if sx < -scaled_tile_size or sy < -scaled_tile_size:
                 continue
             if sx > screen.get_width() or sy > screen.get_height():
                 continue
-
+#Draws grass as the base tile.
             base_tile = tiles["."]
             base_scaled = pygame.transform.scale(
                 base_tile,
                 (scaled_tile_size, scaled_tile_size)
             )
             screen.blit(base_scaled, (sx, sy))
-
+#Draws any extra overlay tile on top.
             if ch in tiles and ch != ".":
                 overlay_scaled = pygame.transform.scale(
                     tiles[ch],
